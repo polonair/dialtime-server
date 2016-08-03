@@ -7,8 +7,8 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Polonairs\Dialtime\CommonBundle\Entity\Admin;
-use Polonairs\Dialtime\CommonBundle\Entity\User;
+use Polonairs\Dialtime\ModelBundle\Entity\Admin;
+use Polonairs\Dialtime\ModelBundle\Entity\User;
 
 class UpdateCommand extends ContainerAwareCommand
 {

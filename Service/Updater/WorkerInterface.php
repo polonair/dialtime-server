@@ -2,7 +2,7 @@
 
 namespace Polonairs\Dialtime\ServerBundle\Service\Updater;
 
-use Polonairs\Dialtime\CommonBundle\Entity\ServerJob;
+use Polonairs\Dialtime\ModelBundle\Entity\ServerJob;
 
 interface WorkerInterface
 {

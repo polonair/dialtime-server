@@ -2,10 +2,10 @@
 
 namespace Polonairs\Dialtime\ServerBundle\Service\Updater\Workers\UpdateSpreadsWorker;
 
-use Polonairs\Dialtime\CommonBundle\Entity\ServerJob;
-use Polonairs\Dialtime\CommonBundle\Entity\Offer;
-use Polonairs\Dialtime\CommonBundle\Entity\Campaign;
-use Polonairs\Dialtime\CommonBundle\Entity\Spread;
+use Polonairs\Dialtime\ModelBundle\Entity\ServerJob;
+use Polonairs\Dialtime\ModelBundle\Entity\Offer;
+use Polonairs\Dialtime\ModelBundle\Entity\Campaign;
+use Polonairs\Dialtime\ModelBundle\Entity\Spread;
 use Polonairs\Dialtime\ServerBundle\Service\Updater\WorkerInterface;
 use Doctrine\Bundle\DoctrineBundle\Registry as Doctrine;
 
@@ -28,12 +28,12 @@ class UpdateSpreadsWorker
     	$em = $this->doctrine->getManager();
 
         /* загружаем кампании и предложения */
-    	$campaigns = $em->getRepository("CommonBundle:Campaign")->loadActive();
-    	$offers = $em->getRepository("CommonBundle:Offer")->loadActive();
+    	$campaigns = $em->getRepository("ModelBundle:Campaign")->loadActive();
+    	$offers = $em->getRepository("ModelBundle:Offer")->loadActive();
 
         /* загружаем категории и локации в индексированные идентификаторами массивы */
-    	$locations = $em->getRepository("CommonBundle:Location")->loadIndexed();
-    	$categories = $em->getRepository("CommonBundle:Category")->loadIndexed();
+    	$locations = $em->getRepository("ModelBundle:Location")->loadIndexed();
+    	$categories = $em->getRepository("ModelBundle:Category")->loadIndexed();
 
         /* подготавливаем массив с данными */
     	$data = [];
@@ -54,7 +54,7 @@ class UpdateSpreadsWorker
     	}
 
         /* загружаем имеющиеся спреды в индексированную матрицу */
-    	$spreads = $em->getRepository("CommonBundle:Spread")->loadMatrix();
+    	$spreads = $em->getRepository("ModelBundle:Spread")->loadMatrix();
 
     	foreach ($data as $category_id => $dim1) 
     	{

@@ -2,7 +2,7 @@
 
 namespace Polonairs\Dialtime\ServerBundle\Service\Updater;
 
-use Polonairs\Dialtime\CommonBundle\Entity\ServerJob;
+use Polonairs\Dialtime\ModelBundle\Entity\ServerJob;
 use Polonairs\Dialtime\ServerBundle\Service\Updater\Workers\SaveWorker\SaveWorker;
 use Polonairs\Dialtime\ServerBundle\Service\Updater\Workers\FakeSaveWorker\FakeSaveWorker;
 use Polonairs\Dialtime\ServerBundle\Service\Updater\Workers\BillWorker\BillWorker;
@@ -29,7 +29,7 @@ class Updater
 	public function updateAll($serverId, $count = 1)
 	{
 		$em = $this->doctrine->getManager();
-		$jobs = $em->getRepository("CommonBundle:ServerJob")->loadJobsForServerId($serverId);
+		$jobs = $em->getRepository("ModelBundle:ServerJob")->loadJobsForServerId($serverId);
 		//dump($jobs);
 		for ($i = 0; $i < $count; $i++) foreach($jobs as $job) $this->doJob($job);
 		return "done";

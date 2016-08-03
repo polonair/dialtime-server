@@ -2,7 +2,7 @@
 
 namespace Polonairs\Dialtime\ServerBundle\Service\Updater\Workers\SyncDonglesWorker;
 
-use Polonairs\Dialtime\CommonBundle\Entity\ServerJob;
+use Polonairs\Dialtime\ModelBundle\Entity\ServerJob;
 use Polonairs\Dialtime\ServerBundle\Service\Updater\WorkerInterface;
 use Doctrine\Bundle\DoctrineBundle\Registry as Doctrine;
 
@@ -23,8 +23,8 @@ class SyncDonglesWorker
 	public function doJob()
 	{
 		$em = $this->doctrine->getManager();
-		$gates = $em->getRepository("CommonBundle:Gate")->loadAllIndexed();
-		$_dongles = $em->getRepository("CommonBundle:Dongle")->loadAll();
+		$gates = $em->getRepository("ModelBundle:Gate")->loadAllIndexed();
+		$_dongles = $em->getRepository("ModelBundle:Dongle")->loadAll();
 		$dongles = [];
 		foreach($_dongles as $d)
 		{

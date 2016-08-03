@@ -2,12 +2,12 @@
 
 namespace Polonairs\Dialtime\ServerBundle\Service\Updater\Workers\SaveWorker;
 
-use Polonairs\Dialtime\CommonBundle\Entity\ServerJob;
+use Polonairs\Dialtime\ModelBundle\Entity\ServerJob;
 use Polonairs\Dialtime\ServerBundle\Service\Updater\WorkerInterface;
 use Doctrine\Bundle\DoctrineBundle\Registry as Doctrine;
-use Polonairs\Dialtime\CommonBundle\Entity\Route;
-use Polonairs\Dialtime\CommonBundle\Entity\Call;
-use Polonairs\Dialtime\CommonBundle\Entity\Gate;
+use Polonairs\Dialtime\ModelBundle\Entity\Route;
+use Polonairs\Dialtime\ModelBundle\Entity\Call;
+use Polonairs\Dialtime\ModelBundle\Entity\Gate;
 
 class SaveWorker implements WorkerInterface 
 {
@@ -26,7 +26,7 @@ class SaveWorker implements WorkerInterface
     public function doJob()
     {
         $em = $this->doctrine->getManager();
-        $gates = $em->getRepository("CommonBundle:Gate")->findAll();
+        $gates = $em->getRepository("ModelBundle:Gate")->findAll();
         foreach($gates as $gate)
         {
             $this->saveFrom($gate);
@@ -86,9 +86,9 @@ class SaveWorker implements WorkerInterface
                 {
                     if ($composition['route_sid'] === null)
                     {
-                        $dr = $em->getRepository("CommonBundle:Dongle");
-                        $pr = $em->getRepository("CommonBundle:Phone");
-                        $tr = $em->getRepository("CommonBundle:Task");
+                        $dr = $em->getRepository("ModelBundle:Dongle");
+                        $pr = $em->getRepository("ModelBundle:Phone");
+                        $tr = $em->getRepository("ModelBundle:Task");
                         $routes[$composition['route_id']] = (new Route())
                             ->setCustomerNumber($composition['route_customer'])
                             ->setMasterPhone($pr->loadByNumber($composition['route_master']))
@@ -100,7 +100,7 @@ class SaveWorker implements WorkerInterface
                     }
                     else
                     {
-                        $rr = $em->getRepository("CommonBundle:Route");
+                        $rr = $em->getRepository("ModelBundle:Route");
                         $routes[$composition['route_id']] = $rr->findById($composition['route_sid'])[0];
                     }
                 }
