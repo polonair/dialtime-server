@@ -2,8 +2,8 @@
 
 namespace Polonairs\Dialtime\ServerBundle\Service\Updater\Workers\CloseTasksWorker;
 
-use Polonairs\Dialtime\CommonBundle\Entity\ServerJob;
-use Polonairs\Dialtime\CommonBundle\Entity\Task;
+use Polonairs\Dialtime\ModelBundle\Entity\ServerJob;
+use Polonairs\Dialtime\ModelBundle\Entity\Task;
 use Polonairs\Dialtime\ServerBundle\Service\Updater\WorkerInterface;
 use Doctrine\Bundle\DoctrineBundle\Registry as Doctrine;
 
@@ -25,7 +25,7 @@ class CloseTasksWorker
 	{
         $em = $this->doctrine->getManager();
         
-        $tasks = $em->getRepository("CommonBundle:Task")->loadActive();
+        $tasks = $em->getRepository("ModelBundle:Task")->loadActive();
         
         foreach($tasks as $task)
         {

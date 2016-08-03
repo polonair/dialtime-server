@@ -2,7 +2,7 @@
 
 namespace Polonairs\Dialtime\ServerBundle\Service\Updater\Workers\ArchiveRecordsWorker;
 
-use Polonairs\Dialtime\CommonBundle\Entity\ServerJob;
+use Polonairs\Dialtime\ModelBundle\Entity\ServerJob;
 use Polonairs\Dialtime\ServerBundle\Service\Updater\WorkerInterface;
 use Doctrine\Bundle\DoctrineBundle\Registry as Doctrine;
 

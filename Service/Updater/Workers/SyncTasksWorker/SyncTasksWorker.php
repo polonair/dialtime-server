@@ -2,10 +2,10 @@
 
 namespace Polonairs\Dialtime\ServerBundle\Service\Updater\Workers\SyncTasksWorker;
 
-use Polonairs\Dialtime\CommonBundle\Entity\ServerJob;
-use Polonairs\Dialtime\CommonBundle\Entity\Gate;
-use Polonairs\Dialtime\CommonBundle\Entity\Phone;
-use Polonairs\Dialtime\CommonBundle\Entity\Dongle;
+use Polonairs\Dialtime\ModelBundle\Entity\ServerJob;
+use Polonairs\Dialtime\ModelBundle\Entity\Gate;
+use Polonairs\Dialtime\ModelBundle\Entity\Phone;
+use Polonairs\Dialtime\ModelBundle\Entity\Dongle;
 use Polonairs\Dialtime\ServerBundle\Service\Updater\WorkerInterface;
 use Doctrine\Bundle\DoctrineBundle\Registry as Doctrine;
 
@@ -26,10 +26,10 @@ class SyncTasksWorker
 	public function doJob()
 	{
 		$em = $this->doctrine->getManager();
-		$gates = $em->getRepository("CommonBundle:Gate")->loadAllIndexed();
-		$tasks = $em->getRepository("CommonBundle:Task")->loadActive();
-		$dongles = $em->getRepository("CommonBundle:Dongle")->loadAll();
-		$routes = $em->getRepository("CommonBundle:Route")->loadActive();
+		$gates = $em->getRepository("ModelBundle:Gate")->loadAllIndexed();
+		$tasks = $em->getRepository("ModelBundle:Task")->loadActive();
+		$dongles = $em->getRepository("ModelBundle:Dongle")->loadAll();
+		$routes = $em->getRepository("ModelBundle:Route")->loadActive();
 		$dongles_by_campaign = [];
 		$dongles_by_gate = [];
 
@@ -164,7 +164,7 @@ class SyncTasksWorker
 		$used = [];
 		foreach($keys as $key)
 		{
-			$latest = $em->getRepository("CommonBundle:Call")->loadLatestForTerminator($all_terminators[$key]);
+			$latest = $em->getRepository("ModelBundle:Call")->loadLatestForTerminator($all_terminators[$key]);
 			if ($latest !== null) $date[$key] = $latest->getCreatedAt();
 			else $date[$key] = new \DateTime("@0");
 			$used[$key] = ($all_terminators[$key]->getCampaign() !== null);

@@ -2,11 +2,11 @@
 
 namespace Polonairs\Dialtime\ServerBundle\Service\Updater\Workers\FakeSaveWorker;
 
-use Polonairs\Dialtime\CommonBundle\Entity\ServerJob;
+use Polonairs\Dialtime\ModelBundle\Entity\ServerJob;
 use Polonairs\Dialtime\ServerBundle\Service\Updater\WorkerInterface;
 use Doctrine\Bundle\DoctrineBundle\Registry as Doctrine;
-use Polonairs\Dialtime\CommonBundle\Entity\Route;
-use Polonairs\Dialtime\CommonBundle\Entity\Call;
+use Polonairs\Dialtime\ModelBundle\Entity\Route;
+use Polonairs\Dialtime\ModelBundle\Entity\Call;
 
 class FakeSaveWorker implements WorkerInterface 
 {
@@ -31,8 +31,8 @@ class FakeSaveWorker implements WorkerInterface
         if ($this->job === null || $this->doctrine === null) return;
         $em = $this->doctrine->getManager();
 
-        $routes = $em->getRepository("CommonBundle:Route")->loadActive();
-        $dongles = $em->getRepository("CommonBundle:Dongle")->findAll();
+        $routes = $em->getRepository("ModelBundle:Route")->loadActive();
+        $dongles = $em->getRepository("ModelBundle:Dongle")->findAll();
         
         $customer = "";
         if (count($routes) > 0 && rand(0, 10) >= 3) // old customer
@@ -43,7 +43,7 @@ class FakeSaveWorker implements WorkerInterface
         $originator = $dongles[rand(0, count($dongles)-1)];
         $originator->getNumber();
 
-        $route = $em->getRepository("CommonBundle:Route")->loadRouteForOrigination($customer, $originator);
+        $route = $em->getRepository("ModelBundle:Route")->loadRouteForOrigination($customer, $originator);
 
         if ($route !== null)
         {
@@ -63,16 +63,16 @@ class FakeSaveWorker implements WorkerInterface
         }
         else
         {
-            $task = $em->getRepository("CommonBundle:Task")->loadTaskForOriginator($originator);
+            $task = $em->getRepository("ModelBundle:Task")->loadTaskForOriginator($originator);
             if ($task !== null)
             {
-                $route = $em->getRepository("CommonBundle:Route")->loadRouteForPartnership($customer, $task->getOffer()->getOwner());
+                $route = $em->getRepository("ModelBundle:Route")->loadRouteForPartnership($customer, $task->getOffer()->getOwner());
                 if ($route !== null) $task = null;
             }
             if ($task !== null)
             {
                 $master_phone = $task->getOffer()->getPhone();
-                $terminator = $em->getRepository("CommonBundle:Dongle")->suggestTerminator($master_phone, $originator);
+                $terminator = $em->getRepository("ModelBundle:Dongle")->suggestTerminator($master_phone, $originator);
                 if ($terminator !== null)
                 {
                     $route = (new Route())

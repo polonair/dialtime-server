@@ -2,10 +2,10 @@
 
 namespace Polonairs\Dialtime\ServerBundle\Service\Updater\Workers\OpenTasksWorker;
 
-use Polonairs\Dialtime\CommonBundle\Entity\ServerJob;
-use Polonairs\Dialtime\CommonBundle\Entity\Campaign;
-use Polonairs\Dialtime\CommonBundle\Entity\Task;
-use Polonairs\Dialtime\CommonBundle\Entity\Offer;
+use Polonairs\Dialtime\ModelBundle\Entity\ServerJob;
+use Polonairs\Dialtime\ModelBundle\Entity\Campaign;
+use Polonairs\Dialtime\ModelBundle\Entity\Task;
+use Polonairs\Dialtime\ModelBundle\Entity\Offer;
 use Polonairs\Dialtime\ServerBundle\Service\Updater\WorkerInterface;
 use Doctrine\Bundle\DoctrineBundle\Registry as Doctrine;
 
@@ -27,18 +27,18 @@ class OpenTasksWorker
 	{
         $em = $this->doctrine->getManager();
         
-        $mrefpays = $em->getRepository("CommonBundle:Parameter")->loadArray("referral:pay:master");
-        $prefpays = $em->getRepository("CommonBundle:Parameter")->loadArray("referral:pay:partner");
+        $mrefpays = $em->getRepository("ModelBundle:Parameter")->loadArray("referral:pay:master");
+        $prefpays = $em->getRepository("ModelBundle:Parameter")->loadArray("referral:pay:partner");
         
         $minmal_spread = 0;
         foreach($mrefpays as $v) $minimal_spread += $v;
         foreach($prefpays as $v) $minimal_spread += $v;
         
-        $campaigns = $em->getRepository("CommonBundle:Campaign")->loadActive();
-        $offers = $em->getRepository("CommonBundle:Offer")->loadActive();
+        $campaigns = $em->getRepository("ModelBundle:Campaign")->loadActive();
+        $offers = $em->getRepository("ModelBundle:Offer")->loadActive();
         
-        $tasks = $em->getRepository("CommonBundle:Task")->loadMatrix();
-        $spreads = $em->getRepository("CommonBundle:Spread")->loadMatrix();
+        $tasks = $em->getRepository("ModelBundle:Task")->loadMatrix();
+        $spreads = $em->getRepository("ModelBundle:Spread")->loadMatrix();
         
         foreach($campaigns as $ck => $campaign)
         {

@@ -2,13 +2,13 @@
 
 namespace Polonairs\Dialtime\ServerBundle\Service\Updater\Workers\BillWorker;
 
-use Polonairs\Dialtime\CommonBundle\Entity\ServerJob;
-use Polonairs\Dialtime\CommonBundle\Entity\Route;
-use Polonairs\Dialtime\CommonBundle\Entity\Call;
-use Polonairs\Dialtime\CommonBundle\Entity\Task;
-use Polonairs\Dialtime\CommonBundle\Entity\Account;
-use Polonairs\Dialtime\CommonBundle\Entity\Transaction;
-use Polonairs\Dialtime\CommonBundle\Entity\TransactionEntry;
+use Polonairs\Dialtime\ModelBundle\Entity\ServerJob;
+use Polonairs\Dialtime\ModelBundle\Entity\Route;
+use Polonairs\Dialtime\ModelBundle\Entity\Call;
+use Polonairs\Dialtime\ModelBundle\Entity\Task;
+use Polonairs\Dialtime\ModelBundle\Entity\Account;
+use Polonairs\Dialtime\ModelBundle\Entity\Transaction;
+use Polonairs\Dialtime\ModelBundle\Entity\TransactionEntry;
 use Polonairs\Dialtime\ServerBundle\Service\Updater\WorkerInterface;
 use Doctrine\Bundle\DoctrineBundle\Registry as Doctrine;
 
@@ -29,7 +29,7 @@ class BillWorker
 	public function doJob()
 	{
         $em = $this->doctrine->getManager();
-        $routes2Bill = $em->getRepository("CommonBundle:Call")->loadUnbilledCalls();
+        $routes2Bill = $em->getRepository("ModelBundle:Call")->loadUnbilledCalls();
         //dump($routes2Bill);
         foreach($routes2Bill as $r) $this->billOut($r);
 	}
@@ -46,9 +46,9 @@ class BillWorker
         $mraccs = [];
         $pacc = $route->getOriginator()->getCampaign()->getOwner()->getUser()->getMainAccount();
         $praccs = [];
-        $sacc = $em->getRepository("CommonBundle:Parameter")->loadValue("system.account");
+        $sacc = $em->getRepository("ModelBundle:Parameter")->loadValue("system.account");
         if ($sacc === null) return;
-        $sacc = $em->getRepository("CommonBundle:Account")->findOneById($sacc);
+        $sacc = $em->getRepository("ModelBundle:Account")->findOneById($sacc);
         
         $entry_m = (new TransactionEntry())
             ->setTransaction($transaction)
@@ -73,7 +73,7 @@ class BillWorker
 
         $em->flush();
 
-        $em->getRepository("CommonBundle:Transaction")->doHold($transaction);
-        //$em->getRepository("CommonBundle:Transaction")->doApply($transaction);
+        $em->getRepository("ModelBundle:Transaction")->doHold($transaction);
+        //$em->getRepository("ModelBundle:Transaction")->doApply($transaction);
     }
 }
