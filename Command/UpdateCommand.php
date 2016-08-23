@@ -21,7 +21,7 @@ class UpdateCommand extends ContainerAwareCommand
     protected function execute(InputInterface $input, OutputInterface $output)
     {
     	$id = $this->getContainer()->getParameter("server_id");
-    	$result = $this->getContainer()->get('updater')->updateAll($id);
+    	$result = $this->getContainer()->get('dialtime.server.updater')->updateAll($id);
     	$output->writeln($result);
     	$output->writeln("Update done");
     }
