@@ -7,5 +7,5 @@
     "license":     "SEULA",
     "authors":     [ { "name": "Alexander Mosyagin", "email": "fixnim@gmail.com", "role": "Developer" } ],
     "autoload":    { "psr-4": { "Polonairs\\Dialtime\\ServerBundle\\": "" } },
-    "require":     { "dialtime/common": "0.1.5" }
+    "require":     { "dialtime/common": "0.1.6" }
 }
