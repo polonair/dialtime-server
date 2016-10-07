@@ -66,7 +66,8 @@ class InitialFixtureCommand extends ContainerAwareCommand
     {
     	$em = $this->getContainer()->get('doctrine')->getManager();
     	$location = (new Location())
-    		->setName("root_location")
+            ->setName("root_location")
+            ->setLocative("root_location")
     		->setDescription("")
     		->setParent(null);
     	$em->persist($location);
@@ -90,13 +91,14 @@ class InitialFixtureCommand extends ContainerAwareCommand
     protected function createAccounts()
     {
     	$em = $this->getContainer()->get('doctrine')->getManager();
-		$account = (new Account())
-			->setName("SYSTEM_RUR")
-			->setOwner(null)
-			->setCurrency(Account::CURRENCY_RUR)
-			->setState(Account::STATE_ACTIVE)
-			->setCredit(99999999.9);
-		$em->persist($account);
+
+        $account = (new Account())
+            ->setName("SYSTEM_RUR")
+            ->setOwner(null)
+            ->setCurrency(Account::CURRENCY_RUR)
+            ->setState(Account::STATE_ACTIVE)
+            ->setCredit(99999999.9);
+        $em->persist($account);
 
 		$account = (new Account())
 			->setName("SYSTEM_TCR")
