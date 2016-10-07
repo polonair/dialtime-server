@@ -46,9 +46,7 @@ class BillWorker
         $mraccs = [];
         $pacc = $route->getOriginator()->getCampaign()->getOwner()->getUser()->getMainAccount();
         $praccs = [];
-        $sacc = $em->getRepository("ModelBundle:Parameter")->loadValue("system.account");
-        if ($sacc === null) return;
-        $sacc = $em->getRepository("ModelBundle:Account")->findOneById($sacc);
+        $sacc = $em->getRepository("ModelBundle:Account")->findOneByName("SYSTEM_RUR");
         
         $entry_m = (new TransactionEntry())
             ->setTransaction($transaction)
