@@ -3,28 +3,31 @@
 namespace Polonairs\Dialtime\ServerBundle\Service\Updater;
 
 use Polonairs\Dialtime\ModelBundle\Entity\ServerJob;
-use Polonairs\Dialtime\ServerBundle\Service\Updater\Workers\SaveWorker\SaveWorker;
-use Polonairs\Dialtime\ServerBundle\Service\Updater\Workers\FakeSaveWorker\FakeSaveWorker;
-use Polonairs\Dialtime\ServerBundle\Service\Updater\Workers\BillWorker\BillWorker;
-use Polonairs\Dialtime\ServerBundle\Service\Updater\Workers\UpdateSpreadsWorker\UpdateSpreadsWorker;
-use Polonairs\Dialtime\ServerBundle\Service\Updater\Workers\CloseTasksWorker\CloseTasksWorker;
-use Polonairs\Dialtime\ServerBundle\Service\Updater\Workers\OpenTasksWorker\OpenTasksWorker;
-use Polonairs\Dialtime\ServerBundle\Service\Updater\Workers\SendListWorker\SendListWorker;
-use Polonairs\Dialtime\ServerBundle\Service\Updater\Workers\SyncTasksWorker\SyncTasksWorker;
-use Polonairs\Dialtime\ServerBundle\Service\Updater\Workers\SyncRoutesWorker\SyncRoutesWorker;
-use Polonairs\Dialtime\ServerBundle\Service\Updater\Workers\SyncDonglesWorker\SyncDonglesWorker;
-use Polonairs\Dialtime\ServerBundle\Service\Updater\Workers\ArchiveRecordsWorker\ArchiveRecordsWorker;
-use Polonairs\Dialtime\ServerBundle\Service\Updater\Workers\ClearDbWorker\ClearDbWorker;
-use Polonairs\Dialtime\ServerBundle\Service\Updater\Workers\UnholdTransactionsWorker\UnholdTransactionsWorker;
-use Polonairs\Dialtime\ServerBundle\Service\Updater\Workers\AccountCheckWorker\AccountCheckWorker;
+use Polonairs\Dialtime\ServerBundle\Service\Updater\Worker\SaveWorker;
+use Polonairs\Dialtime\ServerBundle\Service\Updater\Worker\FakeSaveWorker;
+use Polonairs\Dialtime\ServerBundle\Service\Updater\Worker\BillWorker;
+use Polonairs\Dialtime\ServerBundle\Service\Updater\Worker\EventProcessor;
+use Polonairs\Dialtime\ServerBundle\Service\Updater\Worker\UpdateSpreadsWorker;
+use Polonairs\Dialtime\ServerBundle\Service\Updater\Worker\CloseTasksWorker;
+use Polonairs\Dialtime\ServerBundle\Service\Updater\Worker\OpenTasksWorker;
+use Polonairs\Dialtime\ServerBundle\Service\Updater\Worker\SendListWorker;
+use Polonairs\Dialtime\ServerBundle\Service\Updater\Worker\SyncTasksWorker;
+use Polonairs\Dialtime\ServerBundle\Service\Updater\Worker\SyncRoutesWorker;
+use Polonairs\Dialtime\ServerBundle\Service\Updater\Worker\SyncDonglesWorker;
+use Polonairs\Dialtime\ServerBundle\Service\Updater\Worker\ArchiveRecordsWorker;
+use Polonairs\Dialtime\ServerBundle\Service\Updater\Worker\ClearDbWorker;
+use Polonairs\Dialtime\ServerBundle\Service\Updater\Worker\UnholdTransactionsWorker;
+use Polonairs\Dialtime\ServerBundle\Service\Updater\Worker\AccountCheckWorker;
 
 class Updater
 {
 	private $doctrine;
+	private $sms_sender;
 
-	public function __construct($doctrine)
+	public function __construct($doctrine, $sms_sender)
 	{
 		$this->doctrine = $doctrine;
+		$this->sms_sender = $sms_sender;
 	}
 	public function updateAll($serverId, $count = 1)
 	{
@@ -39,26 +42,22 @@ class Updater
 		$worker = null;
 		switch($job->getName())
 		{
-			case "save":                $worker = new SaveWorker();               break; 
-			case "bill_out":            $worker = new BillWorker();               break; 
-			case "update_spreads":      $worker = new UpdateSpreadsWorker();      break; 
-			case "close_tasks":         $worker = new CloseTasksWorker();         break; 
-			case "open_tasks":          $worker = new OpenTasksWorker();          break; 
-			case "clear_db":            $worker = new ClearDbWorker();            break;
-			case "send_list":           $worker = new SendListWorker();           break;
-			case "sync_tasks":          $worker = new SyncTasksWorker();          break;
-			case "sync_routes":         $worker = new SyncRoutesWorker();         break;
-			case "sync_dongles":        $worker = new SyncDonglesWorker();        break;
-			case "check_accounts":      $worker = new AccountCheckWorker();       break;
-			case "archive_records":     $worker = new ArchiveRecordsWorker();     break;
-			case "unhold_transactions": $worker = new UnholdTransactionsWorker(); break;
-			default: return;
+			case "save": $worker = new SaveWorker($job, $this->doctrine); break; 
+			case "bill_out": $worker = new BillWorker($job, $this->doctrine); break; 
+			case "event_process": $worker = new EventProcessor($job, $this->doctrine); break;
+			case "update_spreads": $worker = new UpdateSpreadsWorker($job, $this->doctrine); break; 
+			case "close_tasks": $worker = new CloseTasksWorker($job, $this->doctrine); break; 
+			case "open_tasks": $worker = new OpenTasksWorker($job, $this->doctrine); break; 
+			case "clear_db": $worker = new ClearDbWorker($job, $this->doctrine); break;
+			case "send_list": $worker = new SendListWorker($job, $this->doctrine, $this->sms_sender); break;
+			case "sync_tasks": $worker = new SyncTasksWorker($job, $this->doctrine); break;
+			case "sync_routes": $worker = new SyncRoutesWorker($job, $this->doctrine); break;
+			case "sync_dongles": $worker = new SyncDonglesWorker($job, $this->doctrine); break;
+			case "check_accounts": $worker = new AccountCheckWorker($job, $this->doctrine); break;
+			case "archive_records": $worker = new ArchiveRecordsWorker($job, $this->doctrine); break;
+			case "unhold_transactions": $worker = new UnholdTransactionsWorker($job, $this->doctrine); break;
+			default: break;
 		}
-		if ($worker !== null)
-		{
-            $worker->setDoctrine($this->doctrine);
-			$worker->setJob($job);
-			$worker->doJob();
-		}
+		if ($worker !== null) $worker->doJob();
 	}
 }

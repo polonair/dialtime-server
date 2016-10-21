@@ -1,27 +1,23 @@
 <?php 
 
-namespace Polonairs\Dialtime\ServerBundle\Service\Updater\Workers\SendListWorker;
+namespace Polonairs\Dialtime\ServerBundle\Service\Updater\Worker;
 
 use Polonairs\Dialtime\ModelBundle\Entity\ServerJob;
 use Polonairs\Dialtime\ServerBundle\Service\Updater\WorkerInterface;
 use Doctrine\Bundle\DoctrineBundle\Registry as Doctrine;
 
-class SendListWorker
+class AccountCheckWorker
 {
     private $job = null;
     private $doctrine  = null;
 
-	public function __construct() { }
-	public function setJob(ServerJob $job)
-	{
+	public function __construct(ServerJob $job, Doctrine $doctrine) 
+	{ 
         $this->job = $job;
-	}
-	public function setDoctrine(Doctrine $doctrine)
-	{
         $this->doctrine = $doctrine;
 	}
 	public function doJob()
 	{
-        // send list (email, sms and so on)
+        // check accounts - reevaluate balances
 	}
 }

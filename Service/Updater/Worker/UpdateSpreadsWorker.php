@@ -1,6 +1,6 @@
 <?php 
 
-namespace Polonairs\Dialtime\ServerBundle\Service\Updater\Workers\UpdateSpreadsWorker;
+namespace Polonairs\Dialtime\ServerBundle\Service\Updater\Worker;
 
 use Polonairs\Dialtime\ModelBundle\Entity\ServerJob;
 use Polonairs\Dialtime\ModelBundle\Entity\Offer;
@@ -14,15 +14,11 @@ class UpdateSpreadsWorker
     private $job = null;
     private $doctrine  = null;
 
-	public function __construct() { }
-	public function setJob(ServerJob $job)
-	{
+    public function __construct(ServerJob $job, Doctrine $doctrine) 
+    { 
         $this->job = $job;
-	}
-	public function setDoctrine(Doctrine $doctrine)
-	{
         $this->doctrine = $doctrine;
-	}
+    }
 	public function doJob()
 	{
     	$em = $this->doctrine->getManager();
@@ -31,9 +27,15 @@ class UpdateSpreadsWorker
     	$campaigns = $em->getRepository("ModelBundle:Campaign")->loadActive();
     	$offers = $em->getRepository("ModelBundle:Offer")->loadActive();
 
+        //dump($campaigns);
+        //dump($offers);
+
         /* загружаем категории и локации в индексированные идентификаторами массивы */
     	$locations = $em->getRepository("ModelBundle:Location")->loadIndexed();
     	$categories = $em->getRepository("ModelBundle:Category")->loadIndexed();
+
+        //dump($locations);
+        //dump($categories);
 
         /* подготавливаем массив с данными */
     	$data = [];
@@ -46,12 +48,14 @@ class UpdateSpreadsWorker
                 /* если пара предложения и кампании проходима */
     			if($this->compatible($em, $campaign, $offer))
     			{
+                    //echo "\r\nworks: c".$campaign->getId().", o".$offer->getId()."\r\n";
                     /* добавляем разность между спросом и предложением в сырую область массива данных */
     				$data[$campaign->getCategory()->getId()][$campaign->getLocation()->getId()]["raw"][] = 
     					$offer->getAsk() - $campaign->getBid();
     			}
     		}
     	}
+        //dump($data);
 
         /* загружаем имеющиеся спреды в индексированную матрицу */
     	$spreads = $em->getRepository("ModelBundle:Spread")->loadMatrix();
@@ -63,10 +67,10 @@ class UpdateSpreadsWorker
     			$raw = $dim2["raw"];
     			$max = 0;
     			$spread = 0;
-    			foreach($raw as $k => $v)
+    			foreach($raw as $v)
     			{
     				$sum = 0;
-    				foreach ($raw as $key => $value) if ($value >= $v) $sum += $value;
+    				foreach ($raw as $value) if ($value >= $v) $sum += $value;
     				if ($sum >= $max) 
     				{
     					$max = $sum;
@@ -88,13 +92,18 @@ class UpdateSpreadsWorker
     			}
     		}
     	}
-    	$data;
 
     	$em->flush();
     }
-    private function compatible($em, Campaign $campaign, Offer $offer)
+    private function compatible($e, Campaign $c, Offer $o)
     {
-    	//time rubric balance
-    	return true;
+        $now = ((date("N")-1)*1440) + (date("H")*60) + date("i");
+
+        return (
+            ($o->getAsk() < $o->getOwner()->getUser()->getMainAccount()->getBalance()) &&
+            (($o->getAsk() > $c->getBid())) &&
+            ($e->getRepository("ModelBundle:Offer")->isOfferActual($o, $now)) &&
+            ($e->getRepository("ModelBundle:Category")->isChildOrSame($o->getCategory(), $c->getCategory())) &&
+            ($e->getRepository("ModelBundle:Location")->isChildOrSame($o->getLocation(), $c->getLocation())));
     }
 }
