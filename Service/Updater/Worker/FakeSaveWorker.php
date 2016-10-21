@@ -1,6 +1,6 @@
 <?php 
 
-namespace Polonairs\Dialtime\ServerBundle\Service\Updater\Workers\FakeSaveWorker;
+namespace Polonairs\Dialtime\ServerBundle\Service\Updater\Worker;
 
 use Polonairs\Dialtime\ModelBundle\Entity\ServerJob;
 use Polonairs\Dialtime\ServerBundle\Service\Updater\WorkerInterface;
@@ -12,20 +12,16 @@ class FakeSaveWorker implements WorkerInterface
 {
     private $job = null;
     private $doctrine  = null;
-
-	public function __construct() { }
-	public function doJob()
-	{
-        return $this->testDoJob();
-	}
-	public function setJob(ServerJob $job)
-	{
+    
+    public function __construct(ServerJob $job, Doctrine $doctrine) 
+    { 
         $this->job = $job;
-	}
-	public function setDoctrine(Doctrine $doctrine)
-	{
         $this->doctrine = $doctrine;
-	}
+    }
+    public function doJob()
+    {
+        return $this->testDoJob();
+    }
     private function testDoJob()
     {
         if ($this->job === null || $this->doctrine === null) return;

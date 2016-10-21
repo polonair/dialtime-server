@@ -1,6 +1,6 @@
 <?php 
 
-namespace Polonairs\Dialtime\ServerBundle\Service\Updater\Workers\SyncTasksWorker;
+namespace Polonairs\Dialtime\ServerBundle\Service\Updater\Worker;
 
 use Polonairs\Dialtime\ModelBundle\Entity\ServerJob;
 use Polonairs\Dialtime\ModelBundle\Entity\Gate;
@@ -14,13 +14,9 @@ class SyncTasksWorker
     private $job = null;
     private $doctrine  = null;
 
-	public function __construct() { }
-	public function setJob(ServerJob $job)
-	{
+	public function __construct(ServerJob $job, Doctrine $doctrine) 
+	{ 
         $this->job = $job;
-	}
-	public function setDoctrine(Doctrine $doctrine)
-	{
         $this->doctrine = $doctrine;
 	}
 	public function doJob()
@@ -33,11 +29,15 @@ class SyncTasksWorker
 		$dongles_by_campaign = [];
 		$dongles_by_gate = [];
 
+		//dump($tasks);
+
 		foreach($dongles as $dongle)
 		{
 			$dongles_by_campaign[$dongle->getCampaign()===null ? 'null' : $dongle->getCampaign()->getId()][] = $dongle;
 			$dongles_by_gate[$dongle->getGate()->getId()][] = $dongle;
 		}
+		//dump($dongles_by_campaign);
+		//dump($dongles_by_gate);
 
 		$routes_by_master_phone = [];
 
@@ -45,11 +45,13 @@ class SyncTasksWorker
 		{
 			$routes_by_master_phone[$route->getMasterPhone()->getId()][] = $route;
 		}
+		//dump($routes_by_master_phone);
 
 		$uploads = [];
 		foreach($tasks as $task)
 		{
 			$originators = $dongles_by_campaign[$task->getCampaign()->getId()];
+			//dump($originators);
 			foreach($originators as $originator)
 			{
 				$tid = $task->getId();
@@ -61,6 +63,7 @@ class SyncTasksWorker
 					'originator'      => $originator->getNumber(),
 					'master'          => $task->getOffer()->getPhone()->getNumber(),
 					'terminators'     => "",
+					'rate'            => $task->getRate(),
 					'active_interval' => 'P14D'];
 				$terminators = $this->getTerminators(
 					$originator->getGate(), 
@@ -120,7 +123,7 @@ class SyncTasksWorker
             	$q = "
             		INSERT 
             		INTO `tasks`
-            		(`sid`, `state`, `originator`, `master`, `terminators`, `active_interval`) 
+            		(`sid`, `state`, `originator`, `master`, `terminators`, `rate`, `active_interval`) 
             		VALUES  ";
 				foreach($line as $tid => $_line)
 				{
@@ -128,12 +131,13 @@ class SyncTasksWorker
 					{
 						foreach($__line as $___line)
 						{
-							$q .= sprintf("(%d, '%s', '%s', '%s', '%s', '%s'), ",
+							$q .= sprintf("(%d, '%s', '%s', '%s', '%s', '%s', '%s'), ",
 								$___line['sid'],
 								$___line['state'],
 								$___line['originator'],
 								$___line['master'],
 								json_encode($___line['terminators']),
+								$___line['rate'],
 								$___line['active_interval']);
 						}
 					}
