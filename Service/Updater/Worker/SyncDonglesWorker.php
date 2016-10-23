@@ -61,13 +61,16 @@ class SyncDonglesWorker
 	            }
 
 				$insert = [];
-	            foreach ($dongles[$gate->getId()] as $k => $v)
-	            {
-	            	if (!array_key_exists($k, $gate_dongles))
-	            	{
-	            		$insert[] = $k;
-	            	}
-	            }
+				if (array_key_exists($gate->getId(), $dongles) && count($dongles[$gate->getId()]) > 0)
+				{
+					foreach ($dongles[$gate->getId()] as $k => $v)
+		            {
+		            	if (!array_key_exists($k, $gate_dongles))
+		            	{
+		            		$insert[] = $k;
+		            	}
+		            }
+		        }
 
 	            $qd = "";
 	            if (count($delete) > 0)
