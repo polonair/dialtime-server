@@ -79,6 +79,10 @@ class BillWorker
         $task = $route->getTask();        
         $task->setState(Task::STATE_CLOSED);
         $task->setCloseReason(Task::REASON_RG);
+        if ($task->getOffer()->getState() == Offer::STATE_ON)
+        {
+            $task->getOffer()->setState(Offer::STATE_OFF);
+        }
 
         $em->flush();
 

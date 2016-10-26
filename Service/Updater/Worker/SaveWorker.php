@@ -105,9 +105,9 @@ class SaveWorker
     }
     private function getUpdateSidQuery($routes)
     {
-        $result = "";
+        $result = [];
         foreach ($routes as $key => $route)
-            $result .= sprintf(
+            $result[] = sprintf(
                 "UPDATE `routes` SET `sid` = %d WHERE `id` = %d; ", 
                 $route->getId(), 
                 $key);
@@ -139,11 +139,10 @@ class SaveWorker
             }
             $em->flush();
 
-            $connection->multi_query($this->getUpdateSidQuery($routes));             
-            while($connection->more_results());
+            $qs = $this->getUpdateSidQuery($routes);
+            foreach($qs as $q) $connection->query($q);
             $connection->commit();
-            $connection->multi_query("DELETE FROM `calls` WHERE 1;");
-            while($connection->more_results());
+            $connection->query("DELETE FROM `calls` WHERE 1;");
             $connection->commit();
             $connection->close();
         }
