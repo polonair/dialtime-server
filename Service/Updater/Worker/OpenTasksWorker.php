@@ -37,6 +37,7 @@ class OpenTasksWorker
         $spreads = $em->getRepository("ModelBundle:Spread")->loadMatrix();
 
         $max = $min = -1;
+        $rates = [];
         
         foreach($campaigns as $ck => $campaign)
         {
@@ -92,7 +93,8 @@ class OpenTasksWorker
                         if ($rate < $min) $min = $rate;
                         if ($rate > $max) $max = $rate;
                     }
-                    $tasks[$ck][$ok]->setRate($rate);
+                    $rates[$ck][$ok] = $rate;
+                    //$tasks[$ck][$ok]->setRate($rate);
                 }
                 else
                 {
@@ -112,7 +114,8 @@ class OpenTasksWorker
                     }
                     else
                     {
-                        $tasks[$ck][$ok]->setRate(($tasks[$ck][$ok]->getRate()-$min)/($max-$min));
+                        $tasks[$ck][$ok]->setRate(($rates[$ck][$ok]-$min)/($max-$min));
+                        //$tasks[$ck][$ok]->setRate(($tasks[$ck][$ok]->getRate()-$min)/($max-$min));
                     }
                 }         
             }
