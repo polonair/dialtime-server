@@ -7,6 +7,7 @@ use Polonairs\Dialtime\ModelBundle\Entity\Route;
 use Polonairs\Dialtime\ModelBundle\Entity\Call;
 use Polonairs\Dialtime\ModelBundle\Entity\Task;
 use Polonairs\Dialtime\ModelBundle\Entity\Event;
+use Polonairs\Dialtime\ModelBundle\Entity\Offer;
 use Polonairs\Dialtime\ModelBundle\Entity\Account;
 use Polonairs\Dialtime\ModelBundle\Entity\Transaction;
 use Polonairs\Dialtime\ModelBundle\Entity\TransactionEntry;
