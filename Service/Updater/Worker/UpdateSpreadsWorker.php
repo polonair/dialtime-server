@@ -95,7 +95,7 @@ class UpdateSpreadsWorker
 
     	$em->flush();
     }
-    private function compatible($e, Campaign $c, Offer $o)
+    private function compatible_deprecated($e, Campaign $c, Offer $o)
     {
         $now = ((date("N")-1)*1440) + (date("H")*60) + date("i");
 
@@ -103,6 +103,18 @@ class UpdateSpreadsWorker
             ($o->getAsk() < $o->getOwner()->getUser()->getMainAccount()->getBalance()) &&
             (($o->getAsk() > $c->getBid())) &&
             ($e->getRepository("ModelBundle:Offer")->isOfferActual($o, $now)) &&
+            ($e->getRepository("ModelBundle:Category")->isChildOrSame($o->getCategory(), $c->getCategory())) &&
+            ($e->getRepository("ModelBundle:Location")->isChildOrSame($o->getLocation(), $c->getLocation())));
+    }
+    private function compatible($e, Campaign $c, Offer $o)
+    {
+        $time = time() + $o->getSchedule()->getTimezone()*60;
+        $now = ((date("N", $time)-1)*1440) + (date("H", $time)*60) + date("i", $time);
+
+        return (
+            ($o->getAsk() < $o->getOwner()->getUser()->getMainAccount()->getBalance()) &&
+            (($o->getAsk() > $c->getBid())) &&
+            ($e->getRepository("ModelBundle:Offer")->isOfferActual_new($o, $now)) &&
             ($e->getRepository("ModelBundle:Category")->isChildOrSame($o->getCategory(), $c->getCategory())) &&
             ($e->getRepository("ModelBundle:Location")->isChildOrSame($o->getLocation(), $c->getLocation())));
     }
