@@ -48,8 +48,10 @@ class CloseTasksWorker
     }
     private function taskIsTimeOuted($em, Task $task)
     {
-        $now = ((date("N")-1)*1440) + (date("H")*60) + date("i");
-        return !$em->getRepository("ModelBundle:Offer")->isOfferActual($task->getOffer(), $now);
+        $time = time() + $task->getOffer()->getSchedule()->getTimezone()*60;
+
+        $now = ((date("N", $time)-1)*1440) + (date("H", $time)*60) + date("i", $time);
+        return !$em->getRepository("ModelBundle:Offer")->isOfferActual_new($task->getOffer(), $now);
     }
     private function correctPrice($em, Task $task)
     {

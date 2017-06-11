@@ -3,9 +3,9 @@
     "homepage":    "http://dialtime.target-call.ru",
     "description": "Dialtime Server Bundle",
     "type":        "symfony-bundle",
-    "version":     "0.1.17",
+    "version":     "0.1.18",
     "license":     "SEULA",
     "authors":     [ { "name": "Alexander Mosyagin", "email": "fixnim@gmail.com", "role": "Developer" } ],
     "autoload":    { "psr-4": { "Polonairs\\Dialtime\\ServerBundle\\": "" } },
-    "require":     { "dialtime/common": "0.1.15" }
+    "require":     { "dialtime/common": "0.1.16" }
 }

@@ -49,8 +49,12 @@ class OpenTasksWorker
                     $partner_rating = $campaign->getOwner()->getUser()->getRateAccount()->getBalance();
                     $comission = $spreads[$campaign->getCategory()->getId()][$campaign->getLocation()->getId()]->getValue();
 
-                    $ask = $offer->getAsk() - ($master_rating*($offer->getAsk()-$campaign->getBid()-$comission)/($master_rating + $partner_rating));
-                    $bid = $campaign->getBid()+($partner_rating*($offer->getAsk()-$campaign->getBid()-$comission)/($master_rating + $partner_rating));
+                    $aK = ($master_rating == $partner_rating)?(0.5):($master_rating/($master_rating + $partner_rating));
+                    $bK = ($master_rating == $partner_rating)?(0.5):($partner_rating/($master_rating + $partner_rating));
+
+                    $ask = $offer->getAsk() - $aK*($offer->getAsk()-$campaign->getBid()-$comission);
+                    $bid = $campaign->getBid() + $bK*($offer->getAsk()-$campaign->getBid()-$comission);
+
                     if (isset($tasks[$ck]) && isset($tasks[$ck][$ok]))
                     {
                         $tasks[$ck][$ok]
@@ -122,7 +126,7 @@ class OpenTasksWorker
         }
         $em->flush();
 	}
-    private function compatible($e, Campaign $c, Offer $o, $spreads)
+    private function compatible_deprecated($e, Campaign $c, Offer $o, $spreads)
     {
         $now = ((date("N")-1)*1440) + (date("H")*60) + date("i");
         return (
@@ -131,6 +135,20 @@ class OpenTasksWorker
             array_key_exists($c->getLocation()->getId(), $spreads[$c->getCategory()->getId()]) &&
             (($o->getAsk()-$c->getBid()) >= $spreads[$c->getCategory()->getId()][$c->getLocation()->getId()]->getValue()) &&
             $e->getRepository("ModelBundle:Offer")->isOfferActual($o, $now) && 
+            $e->getRepository("ModelBundle:Category")->isChildOrSame($o->getCategory(), $c->getCategory()) &&
+            $e->getRepository("ModelBundle:Location")->isChildOrSame($o->getLocation(), $c->getLocation()));
+    }
+    private function compatible($e, Campaign $c, Offer $o, $spreads)
+    {
+        $time = time() + $o->getSchedule()->getTimezone()*60;
+        $now = ((date("N", $time)-1)*1440) + (date("H", $time)*60) + date("i", $time);
+
+        return (
+            ($o->getAsk() < $o->getOwner()->getUser()->getMainAccount()->getBalance()) &&
+            array_key_exists($c->getCategory()->getId(), $spreads) &&
+            array_key_exists($c->getLocation()->getId(), $spreads[$c->getCategory()->getId()]) &&
+            (($o->getAsk()-$c->getBid()) >= $spreads[$c->getCategory()->getId()][$c->getLocation()->getId()]->getValue()) &&
+            $e->getRepository("ModelBundle:Offer")->isOfferActual_new($o, $now) && 
             $e->getRepository("ModelBundle:Category")->isChildOrSame($o->getCategory(), $c->getCategory()) &&
             $e->getRepository("ModelBundle:Location")->isChildOrSame($o->getLocation(), $c->getLocation()));
     }
