@@ -57,7 +57,6 @@ class SaveWorker
                 `routes`.`originator` as `route_originator`,
                 `routes`.`master` as `route_master`,
                 `routes`.`terminator` as `route_terminator`,
-                `routes`.`expired_at` as `route_expired_at`,
                 `routes`.`created_at` as `route_created_at`
             FROM `calls` 
             INNER JOIN `routes` on `calls`.`route_id` = `routes`.`id` 
@@ -84,12 +83,7 @@ class SaveWorker
             ->setOriginator($dr->loadByNumber($comp['route_originator']))
             ->setTerminator($dr->loadByNumber($comp['route_terminator']))
             ->setTask(($comp['route_task_id'] === null)?(null):($tr->find($comp['route_task_id'])))
-            ->setState($comp['route_state'])
-            ->setExpiredAt(new \DateTime($comp['route_expired_at']));
-    }
-    private function findRoute($em, $sid)
-    {
-        return $em->getRepository("ModelBundle:Route")->findOneById($sid);
+            ->setState($comp['route_state']);
     }
     private function createCall($routes, $composition)
     {
@@ -116,7 +110,7 @@ class SaveWorker
     private function getRoute($em, $sid, $composition)
     {
         if ($sid === null) return $this->createRoute($em, $composition);
-        return $this->findRoute($em, $sid);
+        return $em->getRepository("ModelBundle:Route")->findOneById($sid);
     }
     private function saveFrom($em, Gate $gate)
     {
