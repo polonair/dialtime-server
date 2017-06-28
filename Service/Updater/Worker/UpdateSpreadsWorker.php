@@ -70,13 +70,15 @@ class UpdateSpreadsWorker
     			foreach($raw as $v)
     			{
     				$sum = 0;
-    				foreach ($raw as $value) if ($value >= $v) $sum += $value;
+                    //foreach ($raw as $value) if ($value >= $v) $sum += $value;
+                    foreach ($raw as $value) if ($value >= $v) $sum += $v;
     				if ($sum >= $max) 
     				{
     					$max = $sum;
     					$spread = $v;
     				}
     			}
+
     			$data[$category_id][$location_id]["spread"] = $spread;
     			if (array_key_exists($category_id, $spreads) && array_key_exists($location_id, $spreads[$category_id]))
     			{
@@ -94,17 +96,6 @@ class UpdateSpreadsWorker
     	}
 
     	$em->flush();
-    }
-    private function compatible_deprecated($e, Campaign $c, Offer $o)
-    {
-        $now = ((date("N")-1)*1440) + (date("H")*60) + date("i");
-
-        return (
-            ($o->getAsk() < $o->getOwner()->getUser()->getMainAccount()->getBalance()) &&
-            (($o->getAsk() > $c->getBid())) &&
-            ($e->getRepository("ModelBundle:Offer")->isOfferActual($o, $now)) &&
-            ($e->getRepository("ModelBundle:Category")->isChildOrSame($o->getCategory(), $c->getCategory())) &&
-            ($e->getRepository("ModelBundle:Location")->isChildOrSame($o->getLocation(), $c->getLocation())));
     }
     private function compatible($e, Campaign $c, Offer $o)
     {

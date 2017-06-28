@@ -101,10 +101,7 @@ class SaveWorker
     {
         $result = [];
         foreach ($routes as $key => $route)
-            $result[] = sprintf(
-                "UPDATE `routes` SET `sid` = %d WHERE `id` = %d; ", 
-                $route->getId(), 
-                $key);
+            $result[] = sprintf("UPDATE `routes` SET `sid` = %d WHERE `id` = %d; ", $route->getId(), $key);
         return $result;
     }
     private function getRoute($em, $sid, $composition)
